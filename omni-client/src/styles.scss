@@ -1,3 +1,30 @@
+@import '~@aws-amplify/ui-angular/theme.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+.amplify-button--primary {
+  @apply btn btn-primary;
+}
+
+.amplify-input {
+  @apply input input-bordered input-primary
+}
+
+.amplify-input:focus {
+  @apply shadow-none border-primary
+}
+
+.amplify-field__show-password {
+  display: none !important;
+}
+
+div[data-amplify-router] {
+  background-color: theme("colors.base-100") !important;
+}
+
+.amplify-tabs-item[data-state="active"] {
+  @apply text-primary border-t-primary
+}

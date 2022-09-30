@@ -1,4 +1,3 @@
 export type User = {
-  username: string,
-  token: string
+  email: string,
 }

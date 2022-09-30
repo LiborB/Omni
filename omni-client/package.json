@@ -18,7 +18,10 @@
     "@angular/platform-browser": "^14.2.0",
     "@angular/platform-browser-dynamic": "^14.2.0",
     "@angular/router": "^14.2.0",
-    "amazon-cognito-identity-js": "^5.2.10",
+    "@aws-amplify/auth": "^4.6.7",
+    "@aws-amplify/ui-angular": "^2.4.22",
+    "aws-amplify": "^4.3.36",
+    "daisyui": "^2.31.0",
     "rxjs": "~7.5.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.11.4"

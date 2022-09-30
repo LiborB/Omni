@@ -52,11 +52,11 @@ export class OmniServerStack extends cdk.Stack {
             })
         })
 
-        const handler = new Function(this, 'Handler', {
-            code: Code.fromAsset(resolve(__dirname, '../api/dist')),
+        const handler = new Function(this, 'ApiLambda', {
+            code: Code.fromAsset(resolve(__dirname, '../api.zip')),
             handler: 'main.handler',
             runtime: Runtime.NODEJS_16_X,
-            functionName: "omni-api-lambda"
+            functionName: "omni-api-lambda",
         });
 
         const authorizer = new CognitoUserPoolsAuthorizer(this, 'ApiAuthorizer', {

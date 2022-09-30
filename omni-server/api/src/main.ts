@@ -13,7 +13,7 @@ async function bootstrap(): Promise<Handler> {
   return serverlessExpress({ app: expressApp });
 }
 
-export const api: Handler = async (
+export const handler: Handler = async (
     event: any,
     context: Context,
     callback: Callback,

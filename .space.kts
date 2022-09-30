@@ -1,10 +1,11 @@
 job("Run npm i and build") {
     container(displayName = "Run publish script", image = "node:16-alpine") {
+        env["AWS_ACCESS_KEY_ID"] = Params("$access_key_id")
+        env["AWS_SECRET_ACCESS_KEY"] = Params("$access_key_secret")
+
         shellScript {
             interpreter = "/bin/sh"
             content = """
-            	set AWS_ACCESS_KEY_ID=$access_key_id
-                set AWS_SECRET_ACCESS_KEY=$access_key_secret
                 cd omni-server
                 npm ci --production
                 cd api

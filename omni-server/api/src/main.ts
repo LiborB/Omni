@@ -3,13 +3,6 @@ import { AppModule } from './app.module';
 import {Callback, Context, Handler} from "aws-lambda";
 import serverlessExpress from '@vendia/serverless-express';
 
-
-// async function bootstrap() {
-//   const app = await NestFactory.create(AppModule);
-//   await app.listen(3000);
-// }
-// bootstrap();
-
 let server: Handler;
 
 async function bootstrap(): Promise<Handler> {
@@ -28,3 +21,13 @@ export const api: Handler = async (
   server = server ?? (await bootstrap());
   return server(event, context, callback);
 };
+
+async function bootstrapLocal() {
+  const app = await NestFactory.create(AppModule, { cors: true });
+
+  await app.listen(3000)
+}
+
+if (process.env.LOCAL === "true") {
+  bootstrapLocal()
+}

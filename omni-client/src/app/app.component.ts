@@ -29,5 +29,6 @@ export class AppComponent {
   }
 
   constructor(public authenticator: AuthenticatorService) {
+
   }
 }

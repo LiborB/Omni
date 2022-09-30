@@ -1,7 +1,7 @@
 job("Run npm i and build") {
     container(displayName = "Run publish script", image = "node:16-alpine") {
-        env["AWS_ACCESS_KEY_ID"] = Params("$access_key_id")
-        env["AWS_SECRET_ACCESS_KEY"] = Params("$access_key_secret")
+        env["AWS_ACCESS_KEY_ID"] = Params("access_key_id")
+        env["AWS_SECRET_ACCESS_KEY"] = Params("access_key_secret")
 
         shellScript {
             interpreter = "/bin/sh"

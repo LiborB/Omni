@@ -16,6 +16,7 @@ job("Run npm i and build") {
                 npx cdk bootstrap aws://368175386802/ap-southeast-2
                 npx cdk synth
                 npx cdk deploy
+
             """
         }
     }

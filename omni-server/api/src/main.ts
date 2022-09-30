@@ -1,7 +1,14 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import {Callback, Context, Handler} from "aws-lambda";
-import serverlessExpress from "@vendia/serverless-express"
+import serverlessExpress from '@vendia/serverless-express';
+
+
+// async function bootstrap() {
+//   const app = await NestFactory.create(AppModule);
+//   await app.listen(3000);
+// }
+// bootstrap();
 
 let server: Handler;
 
@@ -13,7 +20,7 @@ async function bootstrap(): Promise<Handler> {
   return serverlessExpress({ app: expressApp });
 }
 
-export const handler: Handler = async (
+export const api: Handler = async (
     event: any,
     context: Context,
     callback: Callback,

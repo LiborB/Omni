@@ -1,5 +1,6 @@
 export const environment = {
   production: true,
-  userPoolId: "ap-southeast-2_NdJARZUhz",
-  clientId: "a74k7ubl8dsvjtv5sj1nl8o1k"
+  userPoolId: 'ap-southeast-2_WeteLtfZv',
+  clientId: '7k50p099j0lo3cqsfhjqfugahn',
+  apiUrl: 'http://localhost:3000',
 };

@@ -1,0 +1,28 @@
+<div nz-row nzAlign="middle">
+  <nz-page-header nz-col [nzTitle]="selectedPlaylist ? selectedPlaylist.name : 'All Songs'"></nz-page-header>
+  <input #songUpload (change)="onFileChange($event)" multiple type="file" id="song-upload" class="hidden"
+         accept="audio/wav,audio/mpeg,audio/mp4,audio/aac,audio/aacp,audio/flac"/>
+  <label for="song-upload">
+    <button (click)="songUpload.click()" nz-button nzType="primary">Add Songs</button>
+  </label>
+</div>
+
+<nz-table [nzShowPagination]="false" [nzLoading]="isLoadingSongs" [nzLoadingDelay]="1000" [nzData]="songs" #songTable>
+  <thead>
+  <tr>
+    <th>Title</th>
+    <th>Artist</th>
+    <th>Album</th>
+    <th>Duration</th>
+  </tr>
+  </thead>
+
+  <tbody>
+  <tr *ngFor="let song of songTable.data" class="cursor-pointer">
+    <td>{{song.title}}</td>
+    <td>{{song.artist?.name}}</td>
+    <td>{{song.album?.name}}</td>
+    <td>{{formatSeconds(song.duration)}}</td>
+  </tr>
+  </tbody>
+</nz-table>

@@ -5,13 +5,11 @@ import {
     OAuthScope,
     UserPool,
     UserPoolClient,
-    UserPoolClientIdentityProvider
+    UserPoolClientIdentityProvider, UserPoolDomain
 } from "aws-cdk-lib/aws-cognito";
-import {Code, Function, LayerVersion, Runtime} from "aws-cdk-lib/aws-lambda";
+import {Code, Function, Runtime} from "aws-cdk-lib/aws-lambda";
 import {resolve} from "path";
 import {AuthorizationType, CognitoUserPoolsAuthorizer, LambdaRestApi} from "aws-cdk-lib/aws-apigateway";
-
-// import * as sqs from 'aws-cdk-lib/aws-sqs';
 
 export class OmniServerStack extends cdk.Stack {
     constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -31,7 +29,13 @@ export class OmniServerStack extends cdk.Stack {
                 username: true,
             },
             selfSignUpEnabled: true,
+        })
 
+        const userPoolDomain = new UserPoolDomain(this, "UserPoolDomain", {
+            userPool,
+            cognitoDomain: {
+                domainPrefix: "omni"
+            }
         })
 
         const userPoolClient = new UserPoolClient(this, "UserPoolClient", {
@@ -49,14 +53,14 @@ export class OmniServerStack extends cdk.Stack {
             supportedIdentityProviders: [UserPoolClientIdentityProvider.COGNITO],
             readAttributes: new ClientAttributes().withStandardAttributes({
                 emailVerified: true
-            })
+            }),
         })
 
         const handler = new Function(this, 'ApiLambda', {
-            code: Code.fromAsset(resolve(__dirname, '../api.zip')),
+            code: Code.fromAsset(resolve(__dirname, '../api/dist')),
             handler: 'main.handler',
             runtime: Runtime.NODEJS_16_X,
-            functionName: "omni-api-lambda",
+            functionName: "omni-api-lambda"
         });
 
         const authorizer = new CognitoUserPoolsAuthorizer(this, 'ApiAuthorizer', {

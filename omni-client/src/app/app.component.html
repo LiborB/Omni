@@ -3,9 +3,7 @@
     <div class="mt-8"></div>
   </ng-template>
   <ng-template amplifySlot="authenticated" let-user="user" let-signOut="signOut">
-    <div>Welcome {{user.username}}</div>
-    <button class="bg-teal-200 px-6 py-2 rounded-md hover:opacity-75" (click)="signOut()">Sign Out</button>
-    <router-outlet></router-outlet>
+    <app-layout></app-layout>
   </ng-template>
 
   <ng-template amplifySlot="sign-in-footer">

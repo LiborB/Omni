@@ -1,7 +1,12 @@
-import { Module } from '@nestjs/common';
+import {MiddlewareConsumer, Module, NestModule} from '@nestjs/common';
 import { AppController } from './app.controller';
 import {ConfigModule} from "@nestjs/config";
 import {TypeOrmModule} from "@nestjs/typeorm";
+import { PlaylistModule } from './playlist/playlist.module';
+import {AuthTokenMiddleware} from "./auth-token.middleware";
+import { SongModule } from './song/song.module';
+import { ArtistModule } from './artist/artist.module';
+import { AlbumModule } from './album/album.module';
 
 @Module({
   imports: [ConfigModule.forRoot(),
@@ -11,9 +16,18 @@ import {TypeOrmModule} from "@nestjs/typeorm";
     type: "postgres",
     port: 5432,
     database: "omni",
-    entities: []
-  })],
+    entities: ["dist/**/*.entity.js"],
+    synchronize: false
+  }),
+  PlaylistModule,
+  SongModule,
+  ArtistModule,
+  AlbumModule],
   controllers: [AppController],
   providers: [],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(AuthTokenMiddleware).forRoutes("*")
+  }
+}

@@ -1,9 +1,15 @@
 @import '~@aws-amplify/ui-angular/theme.css';
+@import "~ng-zorro-antd/ng-zorro-antd.min.css";
+@import "~ng-zorro-antd/style/index.min.css"; /* Import base styles */
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+html {
+  font-family: Roboto, sans-serif;
+  overflow: hidden;
+}
 
 .amplify-button--primary {
   @apply btn btn-primary;

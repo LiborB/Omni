@@ -1,8 +1,4 @@
-import {Component, OnInit} from '@angular/core';
-import {Auth} from "aws-amplify"
-import {Router} from "@angular/router";
-import {User} from "./user/user.model";
-import {environment} from "../environments/environment";
+import {Component} from '@angular/core';
 import {AuthenticatorService} from "@aws-amplify/ui-angular";
 
 @Component({

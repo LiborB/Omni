@@ -22,6 +22,9 @@
     "@aws-amplify/ui-angular": "^2.4.22",
     "aws-amplify": "^4.3.36",
     "daisyui": "^2.31.0",
+    "howler": "^2.2.3",
+    "luxon": "^3.0.4",
+    "ng-zorro-antd": "^14.0.0",
     "rxjs": "~7.5.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.11.4"
@@ -31,6 +34,7 @@
     "@angular/cli": "~14.2.3",
     "@angular/compiler-cli": "^14.2.0",
     "@types/jasmine": "~4.0.0",
+    "@types/luxon": "^3.0.1",
     "autoprefixer": "^10.4.12",
     "jasmine-core": "~4.3.0",
     "karma": "~6.4.0",

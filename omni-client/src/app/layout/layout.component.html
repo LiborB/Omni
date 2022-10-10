@@ -1,22 +1,28 @@
 <nz-layout class="h-screen">
-  <nz-sider nzTheme="light">
-    <ul nz-menu nzMode="inline">
-      <li nz-menu-item (click)="onAllSongsClick()" [nzSelected]="selectedPlaylist === null">
-        All Songs
-      </li>
-      <li nz-menu-group nzTitle="Playlists" class="px-2 text-gray-600">
-        <ul>
-          <li nz-menu-item [nzSelected]="selectedPlaylist === playlist" (click)="onPlaylistClick(playlist)"
-              *ngFor="let playlist of playlists">
-            {{playlist.name}}
-          </li>
-        </ul>
-      </li>
+  <nz-layout>
+    <nz-sider nzTheme="light">
+      <ul nz-menu nzMode="inline">
+        <li nz-menu-item (click)="onAllSongsClick()" [nzSelected]="selectedPlaylist === null">
+          All Songs
+        </li>
+        <li nz-menu-group nzTitle="Playlists" class="px-2 text-gray-600">
+          <ul>
+            <li nz-menu-item [nzSelected]="selectedPlaylist === playlist" (click)="onPlaylistClick(playlist)"
+                *ngFor="let playlist of playlists">
+              {{playlist.name}}
+            </li>
+          </ul>
+        </li>
 
-    </ul>
-  </nz-sider>
+      </ul>
+    </nz-sider>
 
-  <nz-content>
-    <router-outlet></router-outlet>
-  </nz-content>
+    <nz-content>
+      <router-outlet></router-outlet>
+    </nz-content>
+  </nz-layout>
+
+  <nz-footer class="p-1">
+    <app-player></app-player>
+  </nz-footer>
 </nz-layout>

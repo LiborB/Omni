@@ -15,6 +15,7 @@ import { SongModule } from './song/song.module';
 import { NzLayoutModule } from 'ng-zorro-antd/layout';
 import { NzMenuModule } from 'ng-zorro-antd/menu';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { NzButtonModule } from 'ng-zorro-antd/button';
 
 Amplify.configure({
   Auth: {
@@ -36,6 +37,7 @@ Amplify.configure({
     SongModule,
     NzLayoutModule,
     NzMenuModule,
+    NzButtonModule,
   ],
   providers: [
     {

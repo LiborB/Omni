@@ -2,8 +2,10 @@
   <nz-page-header nz-col [nzTitle]="selectedPlaylist ? selectedPlaylist.name : 'All Songs'"></nz-page-header>
   <input #songUpload (change)="onFileChange($event)" multiple type="file" id="song-upload" class="hidden"
          accept="audio/wav,audio/mpeg,audio/mp4,audio/aac,audio/aacp,audio/flac"/>
-  <label for="song-upload">
-    <button (click)="songUpload.click()" nz-button nzType="primary">Add Songs</button>
+  <label for="song-upload" *ngIf="!selectedPlaylist">
+    <button (click)="songUpload.click()" nz-button nzType="primary">Add Songs
+      <span nz-icon nzType="upload"></span>
+    </button>
   </label>
 </div>
 
@@ -18,7 +20,8 @@
   </thead>
 
   <tbody>
-  <tr *ngFor="let song of songTable.data" class="cursor-pointer">
+  <tr *ngFor="let song of songTable.data" class="cursor-pointer" (dblclick)="onSongDoubleClick(song)"
+      (contextmenu)="onSongRightClick($event, songMenu, song)">
     <td>{{song.title}}</td>
     <td>{{song.artist?.name}}</td>
     <td>{{song.album?.name}}</td>
@@ -26,3 +29,15 @@
   </tr>
   </tbody>
 </nz-table>
+
+<nz-dropdown-menu #songMenu>
+  <ul nz-menu>
+    <li nz-submenu nzTitle="Add to playlist">
+      <ul>
+        <li nz-menu-item *ngFor="let playlist of playlists"
+            (click)="onAddToPlaylistClick(playlist.id)" [nzDisabled]="selectedPlaylist?.id === playlist.id">{{playlist.name}}</li>
+      </ul>
+    </li>
+    <li nz-menu-item nzDanger>Delete</li>
+  </ul>
+</nz-dropdown-menu>

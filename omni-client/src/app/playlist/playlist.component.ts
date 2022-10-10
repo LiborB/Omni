@@ -6,6 +6,10 @@ import { Song } from '../song/song.model';
 import { Playlist, PlaylistService } from './playlist.service';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { SharedService } from '../shared/shared.service';
+import {
+  NzContextMenuService,
+  NzDropdownMenuComponent,
+} from 'ng-zorro-antd/dropdown';
 
 @Component({
   selector: 'app-playlist',
@@ -20,15 +24,18 @@ export class PlaylistComponent implements OnInit, OnDestroy {
   isDraggingFiles = false;
   playlistId: number | null = null;
   dropdownOpen = false;
-  loadingId?: string;
+  messageId?: string;
   isLoadingSongs = false;
+  selectedSong: Song | null = null;
+  playlists: Playlist[] = [];
 
   constructor(
     private songService: SongService,
     private route: ActivatedRoute,
     private playlistService: PlaylistService,
     private messageService: NzMessageService,
-    private sharedService: SharedService
+    private sharedService: SharedService,
+    private contextMenuService: NzContextMenuService
   ) {}
 
   formatSeconds(seconds?: number) {
@@ -51,6 +58,10 @@ export class PlaylistComponent implements OnInit, OnDestroy {
         (playlist) => (this.selectedPlaylist = playlist)
       )
     );
+
+    this.playlistService.playlists.subscribe((playlists) => {
+      this.playlists = playlists;
+    });
   }
 
   onFileDragEnter(ev: DragEvent) {
@@ -89,21 +100,56 @@ export class PlaylistComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.loadingId = this.messageService.loading('Adding songs...', {
+    this.messageId = this.messageService.loading('Adding songs...', {
       nzDuration: 0,
     }).messageId;
 
     this.subs.add(
       this.songService.addSongs(files).subscribe({
         next: () => {
-          this.messageService.remove(this.loadingId);
+          this.messageService.remove(this.messageId);
           this.fetchSongs();
         },
         error: (err) => {
-          this.messageService.remove(this.loadingId);
+          this.messageService.remove(this.messageId);
           console.log(err);
         },
       })
     );
+  }
+
+  onSongRightClick(
+    event: MouseEvent,
+    menu: NzDropdownMenuComponent,
+    song: Song
+  ) {
+    this.contextMenuService.create(event, menu);
+    this.selectedSong = song;
+  }
+
+  onAddToPlaylistClick(playlistId: number) {
+    const playlist = this.playlists.find(
+      (playlist) => playlist.id === playlistId
+    );
+    if (this.selectedSong) {
+      this.songService
+        .addSongToPlaylist(this.selectedSong.id, playlistId)
+        .subscribe({
+          next: () => {
+            this.messageId = this.messageService.success(
+              `Added ${this.selectedSong?.title} to ${playlist?.name}`
+            ).messageId;
+          },
+          error: (err) => {
+            this.messageId = this.messageService.error(
+              `Failed to add song to ${playlist?.name}`
+            ).messageId;
+          },
+        });
+    }
+  }
+
+  onSongDoubleClick(song: Song) {
+    this.songService.setPlayingSong(song);
   }
 }

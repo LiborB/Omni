@@ -11,6 +11,10 @@ import { NzWaveModule } from 'ng-zorro-antd/core/wave';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzUploadModule } from 'ng-zorro-antd/upload';
 import { NzIconModule } from 'ng-zorro-antd/icon';
+import {
+  NzContextMenuServiceModule,
+  NzDropDownModule,
+} from 'ng-zorro-antd/dropdown';
 
 @NgModule({
   declarations: [PlaylistComponent],
@@ -26,6 +30,8 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
     NzButtonModule,
     NzUploadModule,
     NzIconModule,
+    NzContextMenuServiceModule,
+    NzDropDownModule,
   ],
 })
 export class PlaylistModule {}

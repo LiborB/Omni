@@ -26,7 +26,7 @@ export class SongController {
     return this.songService.getSongs(req.userId, playlistId);
   }
 
-  @Post(':id?')
+  @Post()
   @UseInterceptors(FilesInterceptor('files'))
   async addSongs(@UploadedFiles() files: Express.Multer.File[], @Req() req) {
     await this.songService.addSongs({
@@ -37,5 +37,14 @@ export class SongController {
         filename: file.filename,
       })),
     });
+  }
+
+  @Post(':songId/playlist/:playlistId')
+  async addSongToPlaylist(
+    @Req() req,
+    @Param('songId') songId: string,
+    @Param('playlistId') playlistId: string,
+  ) {
+    await this.songService.addSongToPlaylist(req.userId, +songId, +playlistId);
   }
 }

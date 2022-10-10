@@ -7,6 +7,7 @@ import path from 'path';
 import { PlaylistService } from '../playlist/playlist.service';
 import { ArtistService } from '../artist/artist.service';
 import { AlbumService } from '../album/album.service';
+import { Playlist } from '../playlist/playlist.entity';
 
 export interface AddSongPayload {
   userId: string;
@@ -94,5 +95,25 @@ export class SongService {
 
       await this.songRepository.save(song);
     }
+  }
+
+  async addSongToPlaylist(userId: string, songId: number, playlistId: number) {
+    const playlist = await this.playlistService.getPlaylist(userId, playlistId);
+    const song = await this.songRepository.findOne({
+      where: {
+        id: songId,
+      },
+      relations: {
+        playlists: true,
+      },
+    });
+
+    if (song.playlists.some((playlist) => playlist.id === playlistId)) {
+      return;
+    }
+
+    song.playlists = [...song.playlists, playlist];
+
+    await this.songRepository.save(song);
   }
 }

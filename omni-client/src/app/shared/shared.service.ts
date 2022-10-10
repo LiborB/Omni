@@ -5,6 +5,8 @@ import { Duration } from 'luxon';
   providedIn: 'root',
 })
 export class SharedService {
+  readonly apiBaseUrl = 'http://localhost:3000';
+
   formatSeconds(seconds: number) {
     return Duration.fromObject({ seconds }).toFormat('mm:ss');
   }

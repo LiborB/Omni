@@ -26,8 +26,9 @@ export class PlaylistComponent implements OnInit, OnDestroy {
   dropdownOpen = false;
   messageId?: string;
   isLoadingSongs = false;
-  selectedSong: Song | null = null;
+  selectedContextMenuSong: Song | null = null;
   playlists: Playlist[] = [];
+  currentPlayingSong: Song | null = null;
 
   constructor(
     private songService: SongService,
@@ -59,9 +60,17 @@ export class PlaylistComponent implements OnInit, OnDestroy {
       )
     );
 
-    this.playlistService.playlists.subscribe((playlists) => {
-      this.playlists = playlists;
-    });
+    this.subs.add(
+      this.playlistService.playlists.subscribe((playlists) => {
+        this.playlists = playlists;
+      })
+    );
+
+    this.subs.add(
+      this.songService.currentPlayingSong.subscribe(
+        (song) => (this.currentPlayingSong = song)
+      )
+    );
   }
 
   onFileDragEnter(ev: DragEvent) {
@@ -124,20 +133,20 @@ export class PlaylistComponent implements OnInit, OnDestroy {
     song: Song
   ) {
     this.contextMenuService.create(event, menu);
-    this.selectedSong = song;
+    this.selectedContextMenuSong = song;
   }
 
   onAddToPlaylistClick(playlistId: number) {
     const playlist = this.playlists.find(
       (playlist) => playlist.id === playlistId
     );
-    if (this.selectedSong) {
+    if (this.selectedContextMenuSong) {
       this.songService
-        .addSongToPlaylist(this.selectedSong.id, playlistId)
+        .addSongToPlaylist(this.selectedContextMenuSong.id, playlistId)
         .subscribe({
           next: () => {
             this.messageId = this.messageService.success(
-              `Added ${this.selectedSong?.title} to ${playlist?.name}`
+              `Added ${this.selectedContextMenuSong?.title} to ${playlist?.name}`
             ).messageId;
           },
           error: (err) => {

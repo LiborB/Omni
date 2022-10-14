@@ -3,6 +3,7 @@ import { Subscription } from 'rxjs';
 import { SongService } from '../song.service';
 import { Song } from '../song.model';
 import { Howl } from 'howler';
+import { AuthenticatorService } from '@aws-amplify/ui-angular';
 
 @Component({
   selector: 'app-player',
@@ -14,12 +15,19 @@ export class PlayerComponent implements OnInit, OnDestroy {
 
   private subs = new Subscription();
 
-  constructor(private songService: SongService) {}
+  constructor(
+    private songService: SongService,
+    private authService: AuthenticatorService
+  ) {}
 
   ngOnInit(): void {
     this.subs.add(
       this.songService.currentPlayingSong.subscribe((song) => {
         this.song = song;
+
+        if (song) {
+          this.startSong(song);
+        }
       })
     );
   }
@@ -27,6 +35,16 @@ export class PlayerComponent implements OnInit, OnDestroy {
   startSong(song: Song) {
     const sound = new Howl({
       src: this.songService.getSongPlaybackUrl(song),
+      format: song.extension.replace('.', ''),
+      xhr: {
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${this.authService.user
+            .getSignInUserSession()
+            ?.getAccessToken()
+            .getJwtToken()}`,
+        },
+      },
     });
 
     sound.play();

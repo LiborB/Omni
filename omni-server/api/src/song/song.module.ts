@@ -6,6 +6,7 @@ import { Song } from './song.entity';
 import { PlaylistModule } from '../playlist/playlist.module';
 import { ArtistModule } from '../artist/artist.module';
 import { AlbumModule } from '../album/album.module';
+import { SharedModule } from '../shared/shared.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { AlbumModule } from '../album/album.module';
     ArtistModule,
     PlaylistModule,
     AlbumModule,
+    SharedModule,
   ],
   providers: [SongService],
   controllers: [SongController],

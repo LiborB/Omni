@@ -28,6 +28,9 @@ export class Song {
   @Column()
   userId: string;
 
+  @Column()
+  extension: string;
+
   @ManyToMany(() => Playlist, (playlist) => playlist.songs)
   playlists: Playlist[];
 

@@ -24,6 +24,7 @@
     "migration:down": "./node_modules/.bin/ts-node ./node_modules/.bin/typeorm migration:revert -d ormconfig.ts"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.188.0",
     "@nestjs/common": "^9.0.0",
     "@nestjs/config": "^2.2.0",
     "@nestjs/core": "^9.0.0",

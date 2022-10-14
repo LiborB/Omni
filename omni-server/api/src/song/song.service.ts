@@ -3,11 +3,13 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Song } from './song.entity';
 import { Repository } from 'typeorm';
 import { parseBuffer } from 'music-metadata';
-import path from 'path';
+import { extname, basename } from 'path';
 import { PlaylistService } from '../playlist/playlist.service';
 import { ArtistService } from '../artist/artist.service';
 import { AlbumService } from '../album/album.service';
-import { Playlist } from '../playlist/playlist.entity';
+import { Readable } from 'stream';
+import { GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
+import { SharedService } from '../shared/shared.service';
 
 export interface AddSongPayload {
   userId: string;
@@ -25,6 +27,7 @@ export class SongService {
     private playlistService: PlaylistService,
     private artistService: ArtistService,
     private albumService: AlbumService,
+    private sharedService: SharedService,
   ) {}
 
   async getAllSongs(userId: string): Promise<Song[]> {
@@ -50,11 +53,12 @@ export class SongService {
       });
       const song = new Song();
       song.userId = data.userId;
+      song.extension = extname(file.filename);
 
       if (fileInfo.common.title) {
         song.title = fileInfo.common.title;
       } else {
-        song.title = path.parse(file.filename).name;
+        song.title = basename(file.filename);
       }
 
       if (fileInfo.common.artist) {
@@ -94,6 +98,15 @@ export class SongService {
         : undefined;
 
       await this.songRepository.save(song);
+
+      await this.sharedService.s3.send(
+        new PutObjectCommand({
+          Bucket: 'omni-player-song-bucket',
+          Key: `user/${data.userId}/song/${song.id}`,
+          Body: file.buffer,
+          ContentType: file.mimeType,
+        }),
+      );
     }
   }
 
@@ -115,5 +128,28 @@ export class SongService {
     song.playlists = [...song.playlists, playlist];
 
     await this.songRepository.save(song);
+  }
+
+  async getSongData(songId: number, userId: string) {
+    const song = await this.songRepository.findOneBy({
+      userId,
+      id: songId,
+    });
+
+    if (!song) {
+      return null;
+    }
+
+    const songObject = await this.sharedService.s3.send(
+      new GetObjectCommand({
+        Bucket: 'omni-player-song-bucket',
+        Key: `user/${userId}/song/${songId}`,
+      }),
+    );
+
+    return {
+      data: songObject.Body as Readable,
+      extension: song.extension,
+    };
   }
 }

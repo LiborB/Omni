@@ -21,6 +21,7 @@
     "@ant-design/icons-angular": "^14.1.0",
     "@aws-amplify/auth": "^4.6.7",
     "@aws-amplify/ui-angular": "^2.4.22",
+    "@nestjs/config": "^2.2.0",
     "aws-amplify": "^4.3.36",
     "howler": "^2.2.3",
     "luxon": "^3.0.4",

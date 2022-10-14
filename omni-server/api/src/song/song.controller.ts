@@ -4,6 +4,7 @@ import {
   Param,
   Post,
   Req,
+  StreamableFile,
   UploadedFile,
   UploadedFiles,
   UseInterceptors,
@@ -11,6 +12,7 @@ import {
 import { SongService } from './song.service';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { data } from 'aws-cdk/lib/logging';
+import { ApiNotFoundResponse } from '@nestjs/swagger';
 
 @Controller('song')
 export class SongController {
@@ -34,7 +36,7 @@ export class SongController {
       files: files.map((file) => ({
         buffer: file.buffer,
         mimeType: file.mimetype,
-        filename: file.filename,
+        filename: file.originalname,
       })),
     });
   }
@@ -46,5 +48,16 @@ export class SongController {
     @Param('playlistId') playlistId: string,
   ) {
     await this.songService.addSongToPlaylist(req.userId, +songId, +playlistId);
+  }
+
+  @Get(':songId/play')
+  async playSong(@Req() req, @Param('songId') songId: string) {
+    const songData = await this.songService.getSongData(+songId, req.userId);
+
+    if (!songData) {
+      return ApiNotFoundResponse();
+    }
+
+    return new StreamableFile(songData.data);
   }
 }

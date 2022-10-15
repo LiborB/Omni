@@ -73,12 +73,6 @@ export class PlaylistComponent implements OnInit, OnDestroy {
     );
   }
 
-  onFileDragEnter(ev: DragEvent) {
-    ev.preventDefault();
-
-    this.isDraggingFiles = true;
-  }
-
   fetchSongs() {
     this.isLoadingSongs = true;
     if (this.playlistId) {
@@ -149,7 +143,7 @@ export class PlaylistComponent implements OnInit, OnDestroy {
               `Added ${this.selectedContextMenuSong?.title} to ${playlist?.name}`
             ).messageId;
           },
-          error: (err) => {
+          error: () => {
             this.messageId = this.messageService.error(
               `Failed to add song to ${playlist?.name}`
             ).messageId;

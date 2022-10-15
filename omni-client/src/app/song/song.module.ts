@@ -8,6 +8,7 @@ import {
   StepBackwardOutline,
   StepForwardOutline,
 } from '@ant-design/icons-angular/icons';
+import { NzProgressModule } from 'ng-zorro-antd/progress';
 
 @NgModule({
   declarations: [PlayerComponent],
@@ -19,6 +20,7 @@ import {
       StepForwardOutline,
       StepBackwardOutline,
     ]),
+    NzProgressModule,
   ],
   exports: [PlayerComponent],
 })

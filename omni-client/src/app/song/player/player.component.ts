@@ -15,10 +15,18 @@ export class PlayerComponent implements OnInit, OnDestroy {
 
   private subs = new Subscription();
 
+  playingSongInterval: NodeJS.Timer | null = null;
+  playingSongProgress = 0;
+  private sound: Howl | null = null;
+
   constructor(
     private songService: SongService,
     private authService: AuthenticatorService
   ) {}
+
+  get isPlaying() {
+    return this.sound?.playing();
+  }
 
   ngOnInit(): void {
     this.subs.add(
@@ -33,7 +41,10 @@ export class PlayerComponent implements OnInit, OnDestroy {
   }
 
   startSong(song: Song) {
-    const sound = new Howl({
+    this.playingSongProgress = 0;
+    this.sound?.stop();
+
+    this.sound = new Howl({
       src: this.songService.getSongPlaybackUrl(song),
       format: song.extension.replace('.', ''),
       xhr: {
@@ -47,10 +58,42 @@ export class PlayerComponent implements OnInit, OnDestroy {
       },
     });
 
-    sound.play();
+    this.sound.play();
+
+    if (this.playingSongInterval) {
+      clearInterval(this.playingSongInterval);
+    }
+
+    this.playingSongInterval = setInterval(() => {
+      this.playingSongProgress = Math.round(
+        (this.sound!.seek() / this.sound!.duration()) * 100
+      );
+    }, 100);
   }
 
   ngOnDestroy() {
     this.subs.unsubscribe();
+  }
+
+  barClick(ev: MouseEvent) {
+    if (!this.sound) {
+      return;
+    }
+
+    const target = ev.currentTarget as HTMLDivElement;
+
+    const rect = target.getBoundingClientRect();
+    const duration = this.sound.duration();
+    const newPercent = (ev.clientX - rect.left) / rect.width;
+
+    this.sound.seek(duration * newPercent);
+  }
+
+  togglePlay() {
+    if (this.isPlaying) {
+      this.sound?.pause();
+    } else {
+      this.sound?.play();
+    }
   }
 }

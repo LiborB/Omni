@@ -8,6 +8,7 @@ import { SongModule } from './song/song.module';
 import { ArtistModule } from './artist/artist.module';
 import { AlbumModule } from './album/album.module';
 import { SharedModule } from './shared/shared.module';
+import { QueueModule } from './queue/queue.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { SharedModule } from './shared/shared.module';
     ArtistModule,
     AlbumModule,
     SharedModule,
+    QueueModule,
   ],
   controllers: [AppController],
 })

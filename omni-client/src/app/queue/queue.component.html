@@ -1,0 +1,10 @@
+<div class="px-2 rounded-md">
+  <h3 nz-typography>Queue</h3>
+  <ul class="list-none p-0">
+    <li *ngFor="let queueItem of queueItems">
+      <div (dblclick)="onDoubleClick(queueItem)"
+           class="py-1 px-2 w-full hover:bg-gray-200 cursor-pointer rounded-md select-none"
+      [ngClass]="{'bg-gray-300': playingSong?.id === queueItem.song.id}">{{queueItem.song.title}}</div>
+    </li>
+  </ul>
+</div>

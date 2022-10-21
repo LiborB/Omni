@@ -18,7 +18,14 @@
     </nz-sider>
 
     <nz-content>
-      <router-outlet></router-outlet>
+      <div class="flex">
+        <div class="flex-grow mr-1">
+          <router-outlet></router-outlet>
+        </div>
+        <div class="mr-2 mt-2"><app-queue></app-queue></div>
+
+      </div>
+
     </nz-content>
   </nz-layout>
 

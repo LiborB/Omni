@@ -16,6 +16,8 @@ import { NzLayoutModule } from 'ng-zorro-antd/layout';
 import { NzMenuModule } from 'ng-zorro-antd/menu';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NzButtonModule } from 'ng-zorro-antd/button';
+import { QueueModule } from './queue/queue.module';
+import { NzDividerModule } from 'ng-zorro-antd/divider';
 
 Amplify.configure({
   Auth: {
@@ -38,6 +40,8 @@ Amplify.configure({
     NzLayoutModule,
     NzMenuModule,
     NzButtonModule,
+    QueueModule,
+    NzDividerModule,
   ],
   providers: [
     {

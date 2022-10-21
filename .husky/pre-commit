@@ -1,0 +1,10 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+if ! command -v detect-secrets &> /dev/null
+then
+    echo "detect-secrets command could not be found, please install from https://github.com/Yelp/detect-secrets"
+    exit
+fi
+
+git diff --staged --name-only -z | xargs -0 detect-secrets-hook --baseline .secrets.baseline

@@ -3,11 +3,13 @@ import {
   Entity,
   ManyToMany,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Playlist } from '../playlist/playlist.entity';
 import { Artist } from '../artist/artist.entity';
 import { Album } from '../album/album.entity';
+import { SongQueue } from '../queue/queue.entity';
 
 @Entity()
 export class Song {
@@ -36,4 +38,7 @@ export class Song {
 
   @ManyToOne(() => Artist, (artist) => artist.songs)
   artist?: Artist;
+
+  @OneToMany(() => SongQueue, (songQueue) => songQueue.song)
+  songQueues: SongQueue[];
 }

@@ -10,6 +10,7 @@ import {
   NzContextMenuService,
   NzDropdownMenuComponent,
 } from 'ng-zorro-antd/dropdown';
+import { QueueService } from '../queue/queue.service';
 
 @Component({
   selector: 'app-playlist',
@@ -36,7 +37,8 @@ export class PlaylistComponent implements OnInit, OnDestroy {
     private playlistService: PlaylistService,
     private messageService: NzMessageService,
     private sharedService: SharedService,
-    private contextMenuService: NzContextMenuService
+    private contextMenuService: NzContextMenuService,
+    private queueService: QueueService
   ) {}
 
   formatSeconds(seconds?: number) {
@@ -154,5 +156,30 @@ export class PlaylistComponent implements OnInit, OnDestroy {
 
   onSongDoubleClick(song: Song) {
     this.songService.setPlayingSong(song);
+    this.queueService.clearQueue();
+  }
+
+  onAddToQueueClick() {
+    const song = this.selectedContextMenuSong;
+
+    if (!song) {
+      return;
+    }
+
+    this.subs.add(
+      this.queueService.addToQueue(song.id).subscribe({
+        next: () => {
+          this.messageId = this.messageService.success(
+            `Added ${song.title} to queue`
+          ).messageId;
+          this.queueService.setQueueUpdated();
+        },
+        error: () => {
+          this.messageId = this.messageService.error(
+            'Uh oh, something went wrong'
+          ).messageId;
+        },
+      })
+    );
   }
 }

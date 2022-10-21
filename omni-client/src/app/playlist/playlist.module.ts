@@ -15,6 +15,7 @@ import {
   NzContextMenuServiceModule,
   NzDropDownModule,
 } from 'ng-zorro-antd/dropdown';
+import { QueueModule } from '../queue/queue.module';
 
 @NgModule({
   declarations: [PlaylistComponent],
@@ -32,6 +33,7 @@ import {
     NzIconModule,
     NzContextMenuServiceModule,
     NzDropDownModule,
+    QueueModule,
   ],
 })
 export class PlaylistModule {}

@@ -33,6 +33,9 @@
 
 <nz-dropdown-menu #songMenu>
   <ul nz-menu>
+    <li nz-menu-item (click)="onAddToQueueClick()">
+      Add to queue
+    </li>
     <li nz-submenu nzTitle="Add to playlist">
       <ul>
         <li nz-menu-item *ngFor="let playlist of playlists"

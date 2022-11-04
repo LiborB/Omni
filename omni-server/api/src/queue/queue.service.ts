@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SongQueue } from './queue.entity';
-import { Repository } from 'typeorm';
+import {MoreThan, Not, Repository} from 'typeorm';
+import {NotEquals} from "class-validator";
 
 @Injectable()
 export class QueueService {
@@ -24,13 +25,10 @@ export class QueueService {
     });
   }
 
-  async addSong(songId: number, userId: string) {
+  async addSong(songId: number, userId: string, isPlaying: boolean) {
     const latest = await this.songQueueRepository.findOne({
       where: {
         userId,
-        song: {
-          id: songId,
-        },
       },
       order: {
         order: 'DESC',
@@ -45,6 +43,7 @@ export class QueueService {
       song: {
         id: songId,
       },
+      isPlaying
     });
   }
 
@@ -63,5 +62,59 @@ export class QueueService {
     });
 
     await this.songQueueRepository.remove(queueItems);
+  }
+
+  async updatePlayingStatus(id: number, userId: string, isPlaying: boolean) {
+    const userItems = await this.songQueueRepository.find({
+      where: {
+        userId,
+        id: Not(id)
+      }
+    })
+    userItems.forEach(item => item.isPlaying = false)
+
+
+    const item = await this.songQueueRepository.findOneBy({
+      id, userId
+    })
+
+    if (item) {
+      item.isPlaying = isPlaying
+
+      await this.songQueueRepository.save(userItems.concat(item))
+    }
+  }
+
+  async setNextSongPlaying(userId: string) {
+    const currentPlayingItem = await this.songQueueRepository.findOneBy({
+      userId, isPlaying: true
+    })
+
+    if (!currentPlayingItem) {
+      return
+    }
+
+    const possibleNextItem = await this.songQueueRepository.findOne({
+      where: {
+        userId,
+        order: MoreThan(currentPlayingItem.order)
+      },
+      order: {
+        order: "ASC"
+      }
+    })
+
+    if (possibleNextItem) {
+      currentPlayingItem.isPlaying = false
+      possibleNextItem.isPlaying = true
+
+      await this.songQueueRepository.save([currentPlayingItem, possibleNextItem])
+    }
+  }
+
+  async setPreviousSongPlaying(userId: string) {
+    const currentPlayingItem = await this.songQueueRepository.findOneBy({
+      userId, isPlaying: true
+    })
   }
 }

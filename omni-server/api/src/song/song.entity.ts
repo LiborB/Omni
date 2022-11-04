@@ -23,6 +23,7 @@ export class Song {
   album?: Album;
 
   @Column({
+    type: "numeric",
     nullable: true,
   })
   duration: number | null;

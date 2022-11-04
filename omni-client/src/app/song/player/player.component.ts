@@ -4,6 +4,7 @@ import { SongService } from '../song.service';
 import { Song } from '../song.model';
 import { Howl } from 'howler';
 import { AuthenticatorService } from '@aws-amplify/ui-angular';
+import {QueueService} from "../../queue/queue.service";
 
 @Component({
   selector: 'app-player',
@@ -11,7 +12,7 @@ import { AuthenticatorService } from '@aws-amplify/ui-angular';
   styleUrls: ['./player.component.scss'],
 })
 export class PlayerComponent implements OnInit, OnDestroy {
-  song: Song | null = null;
+  playingSong: Song | null = null;
 
   private subs = new Subscription();
 
@@ -21,7 +22,8 @@ export class PlayerComponent implements OnInit, OnDestroy {
 
   constructor(
     private songService: SongService,
-    private authService: AuthenticatorService
+    private authService: AuthenticatorService,
+    private queueService: QueueService
   ) {}
 
   get isPlaying() {
@@ -30,11 +32,10 @@ export class PlayerComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.subs.add(
-      this.songService.currentPlayingSong.subscribe((song) => {
-        this.song = song;
-
-        if (song) {
-          this.startSong(song);
+      this.queueService.playingItem.subscribe((item) => {
+        if (item) {
+          this.playingSong = item.song;
+          this.startSong(item.song);
         }
       })
     );
@@ -42,7 +43,7 @@ export class PlayerComponent implements OnInit, OnDestroy {
 
   startSong(song: Song) {
     this.playingSongProgress = 0;
-    this.sound?.stop();
+    this.sound?.stop()
 
     this.sound = new Howl({
       src: this.songService.getSongPlaybackUrl(song),
@@ -56,6 +57,9 @@ export class PlayerComponent implements OnInit, OnDestroy {
             .getJwtToken()}`,
         },
       },
+      onend: () => {
+        this.queueService.playNextSong().subscribe()
+      }
     });
 
     this.sound.play();

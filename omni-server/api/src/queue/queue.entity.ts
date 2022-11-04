@@ -5,10 +5,10 @@ import {
   PrimaryGeneratedColumn,
   Unique,
 } from 'typeorm';
-import { Artist } from '../artist/artist.entity';
 import { Song } from '../song/song.entity';
 
 @Entity()
+@Unique(["id", "isPlaying"])
 export class SongQueue {
   @PrimaryGeneratedColumn()
   id: number;
@@ -21,4 +21,7 @@ export class SongQueue {
 
   @Column()
   order: number;
+
+  @Column()
+  isPlaying: boolean
 }

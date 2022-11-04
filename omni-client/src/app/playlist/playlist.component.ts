@@ -1,16 +1,16 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { SongService } from '../song/song.service';
-import { ActivatedRoute } from '@angular/router';
-import { Subscription } from 'rxjs';
-import { Song } from '../song/song.model';
-import { Playlist, PlaylistService } from './playlist.service';
-import { NzMessageService } from 'ng-zorro-antd/message';
-import { SharedService } from '../shared/shared.service';
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {SongService} from '../song/song.service';
+import {ActivatedRoute} from '@angular/router';
+import {concat, Subscription} from 'rxjs';
+import {Song} from '../song/song.model';
+import {Playlist, PlaylistService} from './playlist.service';
+import {NzMessageService} from 'ng-zorro-antd/message';
+import {SharedService} from '../shared/shared.service';
 import {
   NzContextMenuService,
   NzDropdownMenuComponent,
 } from 'ng-zorro-antd/dropdown';
-import { QueueService } from '../queue/queue.service';
+import {QueueService} from '../queue/queue.service';
 
 @Component({
   selector: 'app-playlist',
@@ -22,9 +22,7 @@ export class PlaylistComponent implements OnInit, OnDestroy {
 
   songs: Song[] = [];
   selectedPlaylist: Playlist | null = null;
-  isDraggingFiles = false;
   playlistId: number | null = null;
-  dropdownOpen = false;
   messageId?: string;
   isLoadingSongs = false;
   selectedContextMenuSong: Song | null = null;
@@ -39,7 +37,8 @@ export class PlaylistComponent implements OnInit, OnDestroy {
     private sharedService: SharedService,
     private contextMenuService: NzContextMenuService,
     private queueService: QueueService
-  ) {}
+  ) {
+  }
 
   formatSeconds(seconds?: number) {
     if (!seconds) {
@@ -69,8 +68,10 @@ export class PlaylistComponent implements OnInit, OnDestroy {
     );
 
     this.subs.add(
-      this.songService.currentPlayingSong.subscribe(
-        (song) => (this.currentPlayingSong = song)
+      this.queueService.playingItem.subscribe(
+        (item) => {
+          this.currentPlayingSong = item?.song ?? null
+        }
       )
     );
   }
@@ -155,8 +156,10 @@ export class PlaylistComponent implements OnInit, OnDestroy {
   }
 
   onSongDoubleClick(song: Song) {
-    this.songService.setPlayingSong(song);
-    this.queueService.clearQueue();
+    concat(
+      this.queueService.clearQueue(),
+      this.queueService.addToQueue(song.id, true)
+    ).subscribe()
   }
 
   onAddToQueueClick() {
@@ -167,12 +170,11 @@ export class PlaylistComponent implements OnInit, OnDestroy {
     }
 
     this.subs.add(
-      this.queueService.addToQueue(song.id).subscribe({
+      this.queueService.addToQueue(song.id, false).subscribe({
         next: () => {
           this.messageId = this.messageService.success(
             `Added ${song.title} to queue`
           ).messageId;
-          this.queueService.setQueueUpdated();
         },
         error: () => {
           this.messageId = this.messageService.error(

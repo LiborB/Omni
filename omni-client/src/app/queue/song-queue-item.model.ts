@@ -4,4 +4,5 @@ export interface SongQueueItem {
   id: number;
   song: Song;
   order: number;
+  isPlaying: boolean
 }

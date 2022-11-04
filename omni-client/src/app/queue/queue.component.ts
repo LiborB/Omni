@@ -4,6 +4,7 @@ import { SongQueueItem } from './song-queue-item.model';
 import { Subscription } from 'rxjs';
 import { SongService } from '../song/song.service';
 import { Song } from '../song/song.model';
+import {orderBy} from "lodash";
 
 @Component({
   selector: 'app-queue',
@@ -13,7 +14,7 @@ import { Song } from '../song/song.model';
 export class QueueComponent implements OnInit, OnDestroy {
   private subs = new Subscription();
   queueItems: SongQueueItem[] = [];
-  playingSong: Song | null = null;
+  playingItem: SongQueueItem | null = null;
 
   constructor(
     private queueService: QueueService,
@@ -22,21 +23,13 @@ export class QueueComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.subs.add(
-      this.queueService.queueUpdated.subscribe(() => this.fetchQueueSongs())
+      this.queueService.queueItems.subscribe(items => this.queueItems = orderBy(items, item => item.order))
     );
 
     this.subs.add(
-      this.songService.currentPlayingSong.subscribe((song) => {
-        this.playingSong = song;
+      this.queueService.playingItem.subscribe((item) => {
+        this.playingItem = item ?? null;
       })
-    );
-  }
-
-  fetchQueueSongs() {
-    this.subs.add(
-      this.queueService
-        .getSongQueue()
-        .subscribe((queueItems) => (this.queueItems = queueItems))
     );
   }
 
@@ -45,6 +38,6 @@ export class QueueComponent implements OnInit, OnDestroy {
   }
 
   onDoubleClick(item: SongQueueItem) {
-    this.songService.setPlayingSong(item.song);
+    this.queueService.updatingPlayingStatus(item.id, true).subscribe()
   }
 }

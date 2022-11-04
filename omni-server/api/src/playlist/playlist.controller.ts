@@ -18,6 +18,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { IsNotEmpty } from 'class-validator';
+import {Request} from "express";
 
 class CreatePlaylistRequest {
   @ApiProperty()
@@ -49,7 +50,7 @@ export class PlaylistController {
   constructor(private playlistService: PlaylistService) {}
 
   @Post()
-  async createPlaylist(@Body() body: CreatePlaylistRequest, @Req() req) {
+  async createPlaylist(@Body() body: CreatePlaylistRequest, @Req() req: Request) {
     await this.playlistService.createPlaylist({
       name: body.name,
       userId: req.userId,
@@ -63,7 +64,7 @@ export class PlaylistController {
   @ApiOkResponse()
   async updatePlaylist(
     @Body() body: UpdatePlaylistRequest,
-    @Req() req,
+    @Req() req: Request,
     @Param('id') playlistId: number,
   ) {
     const playlist = await this.playlistService.getPlaylist(
@@ -87,7 +88,7 @@ export class PlaylistController {
     type: PlaylistDto,
     isArray: true,
   })
-  async getPlaylists(@Req() req) {
+  async getPlaylists(@Req() req: Request) {
     return await this.playlistService.getPlaylists(req.userId);
   }
 }

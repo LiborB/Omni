@@ -4,7 +4,7 @@
     <li *ngFor="let queueItem of queueItems">
       <div (dblclick)="onDoubleClick(queueItem)"
            class="py-1 px-2 w-full hover:bg-gray-200 cursor-pointer rounded-md select-none"
-      [ngClass]="{'bg-gray-300': playingSong?.id === queueItem.song.id}">{{queueItem.song.title}}</div>
+      [ngClass]="{'bg-gray-300': playingItem?.id === queueItem.id}">{{queueItem.song.title}}</div>
     </li>
   </ul>
 </div>

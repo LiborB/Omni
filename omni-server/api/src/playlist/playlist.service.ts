@@ -29,8 +29,8 @@ export class PlaylistService {
   async getPlaylist(
     userId: string,
     playlistId: number,
-  ): Promise<Playlist | null> {
-    return await this.playlistRepository.findOne({
+  ): Promise<Playlist> {
+    return await this.playlistRepository.findOneOrFail({
       where: {
         userId,
         id: playlistId,
@@ -41,7 +41,7 @@ export class PlaylistService {
   async getPlaylistSongs(
     userId: string,
     playlistId: number,
-  ): Promise<Song[] | null> {
+  ): Promise<Song[]> {
     const result = await this.playlistRepository.findOne({
       where: {
         userId,
@@ -55,7 +55,7 @@ export class PlaylistService {
       },
     });
 
-    return result.songs;
+    return result?.songs ?? [];
   }
 
   async updatePlaylist(data: {

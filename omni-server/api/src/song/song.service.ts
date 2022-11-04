@@ -95,7 +95,7 @@ export class SongService {
 
       song.duration = fileInfo.format.duration
         ? Math.ceil(fileInfo.format.duration)
-        : undefined;
+        : null;
 
       await this.songRepository.save(song);
 
@@ -112,7 +112,7 @@ export class SongService {
 
   async addSongToPlaylist(userId: string, songId: number, playlistId: number) {
     const playlist = await this.playlistService.getPlaylist(userId, playlistId);
-    const song = await this.songRepository.findOne({
+    const song = await this.songRepository.findOneOrFail({
       where: {
         id: songId,
       },

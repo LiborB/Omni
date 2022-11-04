@@ -1,34 +1,58 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import { SongQueueItem } from './song-queue-item.model';
+import {Injectable} from '@angular/core';
+import {HttpClient} from '@angular/common/http';
+import {BehaviorSubject, distinct, distinctUntilChanged, map, Observable, tap} from 'rxjs';
+import {SongQueueItem} from './song-queue-item.model';
 
 @Injectable({
   providedIn: 'root',
 })
 export class QueueService {
-  private _queueUpdated = new BehaviorSubject<void>(undefined);
-  queueUpdated = this._queueUpdated.asObservable();
+  private _queueItems = new BehaviorSubject<SongQueueItem[]>([])
+  queueItems = this._queueItems.asObservable()
 
-  constructor(private httpClient: HttpClient) {}
+  playingItem = this.queueItems.pipe(map(items => {
+    return items.find(x => x.isPlaying) ?? null
+  }), distinctUntilChanged((prev, curr) => prev?.id === curr?.id))
 
-  setQueueUpdated() {
-    this._queueUpdated.next();
+  constructor(private httpClient: HttpClient) {
+    this.setQueueUpdated()
   }
 
-  getSongQueue(): Observable<SongQueueItem[]> {
+  setQueueUpdated() {
+    this.getSongQueue().subscribe(res => {
+      this._queueItems.next(res)
+    })
+  }
+
+  private getSongQueue(): Observable<SongQueueItem[]> {
     return this.httpClient.get<SongQueueItem[]>('/queue');
   }
 
-  addToQueue(songId: number) {
-    return this.httpClient.post(`/queue/add/${songId}`, {});
+  addToQueue(songId: number, isPlaying: boolean) {
+    return this.httpClient.post(`/queue/add/${songId}`, {
+      isPlaying
+    }).pipe(tap(() => this.setQueueUpdated()));
   }
 
   removeFromQueue(id: number) {
-    return this.httpClient.post(`/queue/remove/${id}`, {});
+    return this.httpClient.post(`/queue/remove/${id}`, {}).pipe(tap(() => this.setQueueUpdated()));
   }
 
   clearQueue() {
-    return this.httpClient.post('/queue/clear', {});
+    return this.httpClient.post('/queue/clear', {}).pipe(tap(() => this.setQueueUpdated()));
+  }
+
+  updatingPlayingStatus(id: number, isPlaying: boolean) {
+    return this.httpClient.post(`/queue/playingstatus/${id}`, {
+      isPlaying
+    }).pipe(tap(() => this.setQueueUpdated()))
+  }
+
+  playNextSong() {
+    return this.httpClient.post("/queue/playnextsong", {}).pipe(tap(() => this.setQueueUpdated()))
+  }
+
+  playPreviousSong() {
+    return this.httpClient.post("/queue/playprevioussong", {}).pipe(tap(() => this.setQueueUpdated()))
   }
 }

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SongQueue } from './queue.entity';
-import {MoreThan, Not, Repository} from 'typeorm';
+import {LessThan, MoreThan, Not, Repository} from 'typeorm';
 import {NotEquals} from "class-validator";
 
 @Injectable()
@@ -116,5 +116,26 @@ export class QueueService {
     const currentPlayingItem = await this.songQueueRepository.findOneBy({
       userId, isPlaying: true
     })
+
+    if (!currentPlayingItem) {
+      return
+    }
+
+    const possiblePreviousItem = await this.songQueueRepository.findOne({
+      where: {
+        userId,
+        order: LessThan(currentPlayingItem.order)
+      },
+      order: {
+        order: "DESC"
+      }
+    })
+
+    if (possiblePreviousItem) {
+      currentPlayingItem.isPlaying = false
+      possiblePreviousItem.isPlaying = true
+
+      await this.songQueueRepository.save([currentPlayingItem, possiblePreviousItem])
+    }
   }
 }

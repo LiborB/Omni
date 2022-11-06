@@ -6,7 +6,8 @@ import { PlaylistComponent } from './playlist/playlist.component';
 const routes: Routes = [
   {
     path: '',
-    component: HomeComponent,
+    redirectTo: "/playlist",
+    pathMatch: "full"
   },
   {
     path: 'playlist/:id',

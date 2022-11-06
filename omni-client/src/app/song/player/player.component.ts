@@ -100,4 +100,18 @@ export class PlayerComponent implements OnInit, OnDestroy {
       this.sound?.play();
     }
   }
+
+  nextSongClick() {
+    this.queueService.playNextSong().subscribe()
+  }
+
+  previousSongClick() {
+    if (this.sound) {
+      if (this.sound.seek() > 5) {
+        this.sound.seek(0)
+      } else {
+        this.queueService.playPreviousSong().subscribe()
+      }
+    }
+  }
 }

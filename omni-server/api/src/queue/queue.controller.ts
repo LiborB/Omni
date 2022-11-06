@@ -43,4 +43,9 @@ export class QueueController {
   async playNextSong(@Req() req: Request) {
     await this.queueService.setNextSongPlaying(req.userId)
   }
+
+  @Post("playprevioussong")
+  async playPreviousSong(@Req() req: Request) {
+    await this.queueService.setPreviousSongPlaying(req.userId)
+  }
 }

@@ -5,6 +5,8 @@ import { Song } from '../song.model';
 import { Howl } from 'howler';
 import { AuthenticatorService } from '@aws-amplify/ui-angular';
 import {QueueService} from "../../queue/queue.service";
+import {Duration} from "luxon";
+import {DomSanitizer, SafeUrl} from "@angular/platform-browser";
 
 @Component({
   selector: 'app-player',
@@ -13,6 +15,7 @@ import {QueueService} from "../../queue/queue.service";
 })
 export class PlayerComponent implements OnInit, OnDestroy {
   playingSong: Song | null = null;
+  thumbnailUrl: SafeUrl | null = null
 
   private subs = new Subscription();
 
@@ -20,10 +23,51 @@ export class PlayerComponent implements OnInit, OnDestroy {
   playingSongProgress = 0;
   private sound: Howl | null = null;
 
+  get songSecondsPlayed(): string {
+    if (!this.sound) {
+      return ""
+    }
+
+    const duration = Duration.fromObject({
+      seconds: this.sound.seek()
+    })
+
+    let format: string
+
+    if (duration.hours > 0) {
+      format = "hh:mm:ss"
+    } else {
+      format = "mm:ss"
+    }
+
+    return duration.toFormat(format)
+  }
+
+  get songSecondsRemaining() {
+    if (!this.sound) {
+      return ""
+    }
+
+    const duration = Duration.fromObject({
+      seconds: this.sound.duration() - this.sound.seek()
+    })
+
+    let format: string
+
+    if (duration.hours > 0) {
+      format = "hh:mm:ss"
+    } else {
+      format = "mm:ss"
+    }
+
+    return duration.toFormat(format)
+  }
+
   constructor(
     private songService: SongService,
     private authService: AuthenticatorService,
-    private queueService: QueueService
+    private queueService: QueueService,
+    private domSanitizer: DomSanitizer
   ) {}
 
   get isPlaying() {
@@ -36,6 +80,13 @@ export class PlayerComponent implements OnInit, OnDestroy {
         if (item) {
           this.playingSong = item.song;
           this.startSong(item.song);
+          this.songService.getSongThumbnail(item.song.id).subscribe(res => {
+            if (res.size) {
+              this.thumbnailUrl = this.domSanitizer.bypassSecurityTrustUrl(URL.createObjectURL(res))
+            } else {
+              this.thumbnailUrl = null
+            }
+          })
         }
       })
     );

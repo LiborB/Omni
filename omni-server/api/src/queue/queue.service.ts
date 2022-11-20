@@ -20,7 +20,9 @@ export class QueueService {
         order: 'ASC',
       },
       relations: {
-        song: true,
+        song: {
+          artist: true
+        },
       },
     });
   }

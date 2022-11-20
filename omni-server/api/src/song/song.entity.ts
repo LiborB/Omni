@@ -34,6 +34,9 @@ export class Song {
   @Column()
   extension: string;
 
+  @Column({nullable: true})
+  thumbnailKey?: string
+
   @ManyToMany(() => Playlist, (playlist) => playlist.songs)
   playlists: Playlist[];
 

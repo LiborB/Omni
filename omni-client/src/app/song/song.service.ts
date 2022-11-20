@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Song } from './song.model';
-import {BehaviorSubject, filter} from 'rxjs';
+import {Observable} from 'rxjs';
 import { SharedService } from '../shared/shared.service';
-import {QueueService} from "../queue/queue.service";
 
 @Injectable({
   providedIn: 'root',
@@ -36,5 +35,11 @@ export class SongService {
 
   getSongPlaybackUrl(song: Song) {
     return `${this.sharedService.apiBaseUrl}/song/${song.id}/play`;
+  }
+
+  getSongThumbnail(songId: number) {
+    return this.http.get(`/song/${songId}/thumbnail`, {
+      responseType: "blob"
+    })
   }
 }

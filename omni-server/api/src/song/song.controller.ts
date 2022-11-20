@@ -12,7 +12,7 @@ import {
 import { SongService } from './song.service';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { data } from 'aws-cdk/lib/logging';
-import { ApiNotFoundResponse } from '@nestjs/swagger';
+import {ApiNotFoundResponse, ApiOkResponse} from '@nestjs/swagger';
 import {Request} from "express";
 
 @Controller('song')
@@ -60,5 +60,15 @@ export class SongController {
     }
 
     return new StreamableFile(songData.data);
+  }
+
+  @Get(":songId/thumbnail")
+  async getSongThumbnail(@Req() req: Request, @Param("songId") songId: string) {
+    const thumbnailData = await this.songService.getSongThumbnail(songId, req.userId)
+    if (!thumbnailData) {
+      return null
+    }
+
+    return new StreamableFile(thumbnailData)
   }
 }

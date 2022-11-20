@@ -25,7 +25,7 @@
     "aws-amplify": "^4.3.36",
     "howler": "^2.2.3",
     "lodash": "^4.17.21",
-    "luxon": "^3.0.4",
+    "luxon": "^3.1.0",
     "ng-zorro-antd": "^14.0.0",
     "rxjs": "~7.5.0",
     "tslib": "^2.3.0",

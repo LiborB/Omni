@@ -10,6 +10,7 @@ import { AlbumService } from '../album/album.service';
 import { Readable } from 'stream';
 import { GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
 import { SharedService } from '../shared/shared.service';
+import {randomUUID} from "crypto";
 
 export interface AddSongPayload {
   userId: string;
@@ -93,6 +94,21 @@ export class SongService {
         }
       }
 
+      if (fileInfo.common.picture?.length) {
+        const picture = fileInfo.common.picture[0]
+        const pictureKey = randomUUID()
+
+        song.thumbnailKey = pictureKey
+        await this.sharedService.s3.send(
+            new PutObjectCommand({
+              Bucket: 'omni-player-thumbnail-bucket',
+              Key: pictureKey,
+              Body: picture.data,
+              ContentType: picture.type,
+            }),
+        );
+      }
+
       song.duration = fileInfo.format.duration
         ? Math.ceil(fileInfo.format.duration)
         : null;
@@ -151,5 +167,23 @@ export class SongService {
       data: songObject.Body as Readable,
       extension: song.extension,
     };
+  }
+
+  async getSongThumbnail(songId: string, userId: string): Promise<Readable | null> {
+    const song = await this.songRepository.findOneBy({
+      id: +songId,
+      userId
+    })
+
+    if (!song?.thumbnailKey) {
+      return null
+    }
+
+    const thumbnailObject = await this.sharedService.s3.send(new GetObjectCommand({
+      Bucket: "omni-player-thumbnail-bucket",
+      Key: song.thumbnailKey
+    }))
+
+    return thumbnailObject.Body as Readable
   }
 }

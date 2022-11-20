@@ -1,15 +1,31 @@
-<div class="flex items-center justify-center">
-  <div class="flex-1 text-right"><span class="max-w-3xl mr-4">{{playingSong?.title}}</span></div>
+<div class="flex items-center justify-center m-1">
+  <div class="flex-grow"></div>
+  <img class="h-10 w-10 mr-2" alt="thumbnail" [src]="thumbnailUrl" *ngIf="thumbnailUrl" />
+  <div class="flex flex-col mr-4">
+    <div><span class="">{{playingSong?.title}}</span></div>
+    <div><span class="text-xs">{{playingSong?.artist?.name}}</span></div>
+  </div>
   <div class="flex flex-col items-center">
     <div class="flex items-center">
-      <span (click)="previousSongClick()" class="!text-xl cursor-pointer flex" nz-icon nzType="step-backward"></span>
-      <span (click)="togglePlay()" class="!text-3xl cursor-pointer px-2 flex" nz-icon [nzType]="isPlaying ? 'pause-circle' : 'play-circle'"></span>
-      <span (click)="nextSongClick()" class="!text-xl cursor-pointer flex" nz-icon nzType="step-forward"></span>
+      <button nzSize="small" nzType="primary" nzShape="circle" nz-button (click)="previousSongClick()">
+        <span nz-icon nzType="step-backward"></span>
+      </button>
+      <button class="mx-1" nz-button nzShape="circle" nzType="primary" (click)="togglePlay()">
+        <span nz-icon [nzType]="isPlaying ? 'pause-circle' : 'play-circle'"></span>
+      </button>
+      <button nzSize="small" nzType="primary" nzShape="circle" nz-button (click)="nextSongClick()">
+        <span nz-icon nzType="step-forward"></span>
+      </button>
     </div>
-    <div class="w-96 bg-gray-200 h-2 rounded-md" (click)="barClick($event)">
-      <div class="h-full bg-blue-400 rounded-md" [ngStyle]="{'width': playingSongProgress + '%'}">
+    <div class="flex">
+      <span class="px-2">{{songSecondsPlayed}}</span>
+      <div class="w-96 bg-gray-200 h-2 rounded-md mt-2 flex" (click)="barClick($event)">
+        <div class="h-full bg-blue-400 rounded-md" [ngStyle]="{'width': playingSongProgress + '%'}">
+        </div>
       </div>
+      <span class="px-2">{{songSecondsRemaining}}</span>
     </div>
+
   </div>
 
   <div class="flex-1"></div>

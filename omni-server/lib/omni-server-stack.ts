@@ -93,6 +93,18 @@ export class OmniServerStack extends cdk.Stack {
       },
     });
 
+    const thumbnailBucket = new Bucket(this, "ThumbnailBucket", {
+      bucketName: "omni-player-thumbnail-bucket",
+      publicReadAccess: false,
+      blockPublicAccess: {
+        blockPublicAcls: true,
+        blockPublicPolicy: true,
+        restrictPublicBuckets: true,
+        ignorePublicAcls: true,
+      },
+    });
+
     songBucket.grantReadWrite(handler);
+    thumbnailBucket.grantReadWrite(handler)
   }
 }

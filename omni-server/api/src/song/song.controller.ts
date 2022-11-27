@@ -4,6 +4,7 @@ import {
   Param,
   Post,
   Req,
+  Res,
   StreamableFile,
   UploadedFile,
   UploadedFiles,
@@ -12,12 +13,12 @@ import {
 import { SongService } from './song.service';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { data } from 'aws-cdk/lib/logging';
-import {ApiNotFoundResponse, ApiOkResponse} from '@nestjs/swagger';
-import {Request} from "express";
+import { ApiNotFoundResponse, ApiOkResponse } from '@nestjs/swagger';
+import { Request, Response } from "express";
 
 @Controller('song')
 export class SongController {
-  constructor(private songService: SongService) {}
+  constructor(private songService: SongService) { }
 
   @Get('all')
   getAllSongs(@Req() req: Request) {

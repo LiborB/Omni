@@ -10,7 +10,10 @@ import { AlbumService } from '../album/album.service';
 import { Readable } from 'stream';
 import { GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
 import { SharedService } from '../shared/shared.service';
-import {randomUUID} from "crypto";
+import { randomUUID } from "crypto";
+import { getSignedUrl } from '@aws-sdk/cloudfront-signer';
+import { DateTime } from 'luxon';
+import axios from 'axios';
 
 export interface AddSongPayload {
   userId: string;
@@ -29,7 +32,7 @@ export class SongService {
     private artistService: ArtistService,
     private albumService: AlbumService,
     private sharedService: SharedService,
-  ) {}
+  ) { }
 
   async getAllSongs(userId: string): Promise<Song[]> {
     return await this.songRepository.find({
@@ -55,6 +58,7 @@ export class SongService {
       const song = new Song();
       song.userId = data.userId;
       song.extension = extname(file.filename);
+      song.songKey = randomUUID()
 
       if (fileInfo.common.title) {
         song.title = fileInfo.common.title;
@@ -100,12 +104,12 @@ export class SongService {
 
         song.thumbnailKey = pictureKey
         await this.sharedService.s3.send(
-            new PutObjectCommand({
-              Bucket: 'omni-player-thumbnail-bucket',
-              Key: pictureKey,
-              Body: picture.data,
-              ContentType: picture.type,
-            }),
+          new PutObjectCommand({
+            Bucket: 'omni-player-thumbnail-bucket',
+            Key: pictureKey,
+            Body: picture.data,
+            ContentType: picture.type,
+          }),
         );
       }
 
@@ -118,7 +122,7 @@ export class SongService {
       await this.sharedService.s3.send(
         new PutObjectCommand({
           Bucket: 'omni-player-song-bucket',
-          Key: `user/${data.userId}/song/${song.id}`,
+          Key: song.songKey,
           Body: file.buffer,
           ContentType: file.mimeType,
         }),
@@ -156,20 +160,17 @@ export class SongService {
       return null;
     }
 
-    const songObject = await this.sharedService.s3.send(
-      new GetObjectCommand({
-        Bucket: 'omni-player-song-bucket',
-        Key: `user/${userId}/song/${songId}`,
-      }),
-    );
+    const response = await axios.get(this.sharedService.generateCloudfrontSignedUrl(`${process.env.SONG_BASE_URL}/${song.songKey}`), {
+      responseType: "arraybuffer"
+    })
 
     return {
-      data: songObject.Body as Readable,
+      data: new Uint8Array(response.data as ArrayBuffer),
       extension: song.extension,
     };
   }
 
-  async getSongThumbnail(songId: string, userId: string): Promise<Readable | null> {
+  async getSongThumbnail(songId: string, userId: string): Promise<Uint8Array | null> {
     const song = await this.songRepository.findOneBy({
       id: +songId,
       userId
@@ -179,11 +180,10 @@ export class SongService {
       return null
     }
 
-    const thumbnailObject = await this.sharedService.s3.send(new GetObjectCommand({
-      Bucket: "omni-player-thumbnail-bucket",
-      Key: song.thumbnailKey
-    }))
+    const response = await axios.get(this.sharedService.generateCloudfrontSignedUrl(`${process.env.THUMBNAIL_BASE_URL}/${song.thumbnailKey}`), {
+      responseType: "arraybuffer"
+    })
 
-    return thumbnailObject.Body as Readable
+    return new Uint8Array(response.data as ArrayBuffer)
   }
 }

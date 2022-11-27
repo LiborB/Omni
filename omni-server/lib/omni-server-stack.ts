@@ -1,3 +1,4 @@
+import "dotenv/config"
 import * as cdk from "aws-cdk-lib";
 import { Construct } from "constructs";
 import {
@@ -19,7 +20,9 @@ import { Bucket } from "aws-cdk-lib/aws-s3";
 import {
   CachePolicy,
   Distribution,
+  KeyGroup,
   OriginRequestPolicy,
+  PublicKey,
 } from "aws-cdk-lib/aws-cloudfront";
 import { S3Origin } from "aws-cdk-lib/aws-cloudfront-origins";
 import { Duration } from "aws-cdk-lib";
@@ -111,8 +114,9 @@ export class OmniServerStack extends cdk.Stack {
       },
     });
 
-    songBucket.grantReadWrite(handler);
-    thumbnailBucket.grantReadWrite(handler);
+    songBucket.grantPut(handler)
+    thumbnailBucket.grantPut(handler)
+
 
     const contentCachePolicy = new CachePolicy(this, "SongCachePolicy", {
       minTtl: Duration.days(7),
@@ -120,11 +124,31 @@ export class OmniServerStack extends cdk.Stack {
       defaultTtl: Duration.days(7),
     });
 
+    const pubKey = new PublicKey(this, "CloudfrontPublicKey", {
+      encodedKey: `-----BEGIN PUBLIC KEY-----
+      MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxiwa7QdH8jywfvpu765Q
+      0xqg1e2JPaPs2pHMhUaWFulvBWzc9km+P94yptEDaOfSe8j17VKWRRMM3hoBajmq
+      vbXe+y0u6gtnxjqp+YWKWqW1rCckU5+gC4KSlOGkSw1XP6r/E7hvDNEbkWanRfY0
+      MSvwA/cxkpWSLCu+5Z74htWbu4Z9x9i3jNOdz56LGh+bmQEWk747ar2e9qzlg6q0
+      pt3f/WBvhWsDe/atMzoJnD2laeksS6dUuUbcRtnbu4kkrAl8byW5DROCc/kcwG4J
+      e/1M22SLZo9E4qiHh044ebMVeOBy7TSf/hwwoNe1jNXgJuYmNy4dvS1EZKyGvfls
+      qwIDAQAB
+      -----END PUBLIC KEY-----`,
+      publicKeyName: "omni-api-access"
+    })
+
+    const keyGroup = new KeyGroup(this, "ApiKeyGroup", {
+      items: [
+        pubKey
+      ]
+    })
+
     new Distribution(this, "SongDistribution", {
       defaultBehavior: {
         origin: new S3Origin(songBucket),
         cachePolicy: contentCachePolicy,
         originRequestPolicy: OriginRequestPolicy.CORS_S3_ORIGIN,
+        trustedKeyGroups: [keyGroup]
       },
     });
 
@@ -133,6 +157,7 @@ export class OmniServerStack extends cdk.Stack {
         origin: new S3Origin(thumbnailBucket),
         originRequestPolicy: OriginRequestPolicy.CORS_S3_ORIGIN,
         cachePolicy: contentCachePolicy,
+        trustedKeyGroups: [keyGroup]
       },
     });
   }

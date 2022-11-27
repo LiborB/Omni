@@ -16,6 +16,13 @@ import {
   LambdaRestApi,
 } from "aws-cdk-lib/aws-apigateway";
 import { Bucket } from "aws-cdk-lib/aws-s3";
+import {
+  CachePolicy,
+  Distribution,
+  OriginRequestPolicy,
+} from "aws-cdk-lib/aws-cloudfront";
+import { S3Origin } from "aws-cdk-lib/aws-cloudfront-origins";
+import { Duration } from "aws-cdk-lib";
 
 export class OmniServerStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -105,6 +112,28 @@ export class OmniServerStack extends cdk.Stack {
     });
 
     songBucket.grantReadWrite(handler);
-    thumbnailBucket.grantReadWrite(handler)
+    thumbnailBucket.grantReadWrite(handler);
+
+    const contentCachePolicy = new CachePolicy(this, "SongCachePolicy", {
+      minTtl: Duration.days(7),
+      maxTtl: Duration.days(7),
+      defaultTtl: Duration.days(7),
+    });
+
+    new Distribution(this, "SongDistribution", {
+      defaultBehavior: {
+        origin: new S3Origin(songBucket),
+        cachePolicy: contentCachePolicy,
+        originRequestPolicy: OriginRequestPolicy.CORS_S3_ORIGIN,
+      },
+    });
+
+    new Distribution(this, "ThumbnailDistribution", {
+      defaultBehavior: {
+        origin: new S3Origin(thumbnailBucket),
+        originRequestPolicy: OriginRequestPolicy.CORS_S3_ORIGIN,
+        cachePolicy: contentCachePolicy,
+      },
+    });
   }
 }

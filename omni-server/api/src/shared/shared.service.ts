@@ -10,14 +10,6 @@ export class SharedService {
   });
 
   generateCloudfrontSignedUrl(url: string) {
-    console.log(getSignedUrl({
-      keyPairId: process.env.CLOUDFRONT_KEY_PAIR_ID!,
-      privateKey: process.env.CLOUDFRONT_PRIVATE_KEY!.replace(/\\n/g, '\n'),
-      url,
-      dateLessThan: DateTime.utc().plus({
-        hour: 1
-      }).toJSDate().toString()
-    }))
     return getSignedUrl({
       keyPairId: process.env.CLOUDFRONT_KEY_PAIR_ID!,
       privateKey: process.env.CLOUDFRONT_PRIVATE_KEY!.replace(/\\n/g, '\n'),

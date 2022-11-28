@@ -7,12 +7,9 @@ import { extname, basename } from 'path';
 import { PlaylistService } from '../playlist/playlist.service';
 import { ArtistService } from '../artist/artist.service';
 import { AlbumService } from '../album/album.service';
-import { Readable } from 'stream';
-import { GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
+import { PutObjectCommand } from '@aws-sdk/client-s3';
 import { SharedService } from '../shared/shared.service';
 import { randomUUID } from "crypto";
-import { getSignedUrl } from '@aws-sdk/cloudfront-signer';
-import { DateTime } from 'luxon';
 import axios from 'axios';
 
 export interface AddSongPayload {

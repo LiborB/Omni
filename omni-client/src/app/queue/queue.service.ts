@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {BehaviorSubject, distinct, distinctUntilChanged, map, Observable, tap} from 'rxjs';
+import {BehaviorSubject, distinctUntilChanged, map, Observable, reduce, skip, tap} from 'rxjs';
 import {SongQueueItem} from './song-queue-item.model';
 
 @Injectable({

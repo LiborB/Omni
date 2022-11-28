@@ -80,6 +80,7 @@ export class PlayerComponent implements OnInit, OnDestroy {
         if (item) {
           this.playingSong = item.song;
           this.startSong(item.song);
+
           this.songService.getSongThumbnail(item.song.id).subscribe(res => {
             if (res.size) {
               this.thumbnailUrl = this.domSanitizer.bypassSecurityTrustUrl(URL.createObjectURL(res))
@@ -115,6 +116,7 @@ export class PlayerComponent implements OnInit, OnDestroy {
 
     this.sound.play();
 
+
     if (this.playingSongInterval) {
       clearInterval(this.playingSongInterval);
     }
@@ -145,11 +147,17 @@ export class PlayerComponent implements OnInit, OnDestroy {
   }
 
   togglePlay() {
+    if (!this.playingSong) {
+      return
+    }
+
     if (this.isPlaying) {
       this.sound?.pause();
     } else {
       this.sound?.play();
     }
+
+    this.queueService.updatingPlayingStatus(this.playingSong?.id, !this.isPlaying).subscribe()
   }
 
   nextSongClick() {

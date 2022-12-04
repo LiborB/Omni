@@ -2,11 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Artist } from './artist.entity';
 import { Repository } from 'typeorm';
+import {SongService} from "../song/song.service";
+import {Song} from "../song/song.entity";
 
 @Injectable()
 export class ArtistService {
   constructor(
-    @InjectRepository(Artist) private artistRepository: Repository<Artist>,
+    @InjectRepository(Artist) private artistRepository: Repository<Artist>
   ) {}
 
   async addArtist(userId: string, name: string) {
@@ -32,5 +34,23 @@ export class ArtistService {
         name: name,
       },
     });
+  }
+
+  async getSongs(userId: string, artistId: number): Promise<Song[]> {
+    const result = await this.artistRepository.findOne({
+      where: {
+        id: artistId,
+        userId
+      },
+      relations: {
+        songs: true
+      }
+    })
+
+    if (!result) {
+      return []
+    }
+
+    return result.songs
   }
 }

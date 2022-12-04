@@ -22,9 +22,9 @@
   <tbody>
   <tr *ngFor="let song of songTable.data" class="cursor-pointer select-none" (dblclick)="onSongDoubleClick(song)"
       (contextmenu)="onSongRightClick($event, songMenu, song)"
-  [ngClass]="{'bg-gray-200 hover:!bg-gray-200': currentPlayingSong?.id === song?.id}">
+      [ngClass]="{'bg-gray-200 hover:!bg-gray-200': currentPlayingSong?.id === song?.id}">
     <td>{{song.title}}</td>
-    <td>{{song.artist?.name}}</td>
+    <td class="hover:underline cursor-pointer" (click)="artistClick(song.artist?.id)">{{song.artist?.name}}</td>
     <td>{{song.album?.name}}</td>
     <td>{{formatSeconds(song.duration)}}</td>
   </tr>

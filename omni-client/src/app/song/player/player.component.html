@@ -3,7 +3,7 @@
   <img class="h-10 w-10 mr-2" alt="thumbnail" [src]="thumbnailUrl" *ngIf="thumbnailUrl" />
   <div class="flex flex-col mr-4">
     <div><span class="">{{playingSong?.title}}</span></div>
-    <div><span class="text-xs">{{playingSong?.artist?.name}}</span></div>
+    <div><span (click)="artistClick()" *ngIf="playingSong?.artist?.name" class="text-xs hover:underline cursor-pointer">{{playingSong?.artist?.name}}</span></div>
   </div>
   <div class="flex flex-col items-center">
     <div class="flex items-center">

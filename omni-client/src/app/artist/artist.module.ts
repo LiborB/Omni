@@ -12,7 +12,6 @@ import {NzPageHeaderModule} from "ng-zorro-antd/page-header";
   ],
   imports: [
     CommonModule,
-    NzGridModule,
     NzPageHeaderModule
   ]
 })

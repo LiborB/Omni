@@ -7,6 +7,7 @@ import { AuthenticatorService } from '@aws-amplify/ui-angular';
 import {QueueService} from "../../queue/queue.service";
 import {Duration} from "luxon";
 import {DomSanitizer, SafeUrl} from "@angular/platform-browser";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-player',
@@ -67,7 +68,8 @@ export class PlayerComponent implements OnInit, OnDestroy {
     private songService: SongService,
     private authService: AuthenticatorService,
     private queueService: QueueService,
-    private domSanitizer: DomSanitizer
+    private domSanitizer: DomSanitizer,
+    private router: Router
   ) {}
 
   get isPlaying() {
@@ -171,6 +173,12 @@ export class PlayerComponent implements OnInit, OnDestroy {
       } else {
         this.queueService.playPreviousSong().subscribe()
       }
+    }
+  }
+
+  async artistClick() {
+    if (this.playingSong?.artist) {
+      await this.router.navigate(["/artist", this.playingSong.artist?.id])
     }
   }
 }

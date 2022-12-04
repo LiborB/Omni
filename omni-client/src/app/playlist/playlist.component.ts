@@ -1,6 +1,6 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {SongService} from '../song/song.service';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {concat, Subscription} from 'rxjs';
 import {Song} from '../song/song.model';
 import {Playlist, PlaylistService} from './playlist.service';
@@ -36,7 +36,8 @@ export class PlaylistComponent implements OnInit, OnDestroy {
     private messageService: NzMessageService,
     private sharedService: SharedService,
     private contextMenuService: NzContextMenuService,
-    private queueService: QueueService
+    private queueService: QueueService,
+    private router: Router
   ) {
   }
 
@@ -183,5 +184,11 @@ export class PlaylistComponent implements OnInit, OnDestroy {
         },
       })
     );
+  }
+
+  async artistClick(artistId?: number) {
+    if (artistId) {
+      await this.router.navigate(["/artist", artistId])
+    }
   }
 }
